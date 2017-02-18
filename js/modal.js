@@ -4,7 +4,6 @@ function Modal() {
 
     this.init = function (data) {
         this.elem = this.getElement(data);
-        console.log(this);
         return this;
     }
 
