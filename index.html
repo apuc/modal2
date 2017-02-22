@@ -10,9 +10,20 @@
 <a id="show" href="#" data-target="test" data-action="show" data-m>Показать</a><br>
 <a id="hide" href="#" data-target="test" data-action="hide" data-m>Убрать</a><br>
 <a id="toggle" href="#" data-target="test" data-m>Тумблер</a><br>
-<div class="myModal" id="test"></div>
+<a id="script-show" href="#">Показать JS</a><br>
+<a id="script-hide" href="#">Убрать JS</a><br>
+<div class="myModal" id="test">
+    <div class="modal-title"></div>
+    <div class="model-body"></div>
+    <div class="modal-footer"></div>
+</div>
 <script>
-
+    document.getElementById('script-show').onclick = function () {
+        $m('#test').set({close:true}).show();
+    }
+    document.getElementById('script-hide').onclick = function () {
+        $m('#test').hide();
+    }
 </script>
 </body>
 </html>
