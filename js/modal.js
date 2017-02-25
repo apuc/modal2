@@ -4,16 +4,24 @@ function Modal() {
 
     this.init = function (data) {
         this.elem = this.getElement(data);
-        this.set();
         this.getModalChild();
-        this.closeBtn();
+        if(this.new){
+            this.create = false;
+            this.set();
+            mPool.push({id:this.id,elem:this.elem,options:this.options});
+        }
         return this;
     };
 
     this.set = function (data) {
         this.defaultParams = {
-            afterOpen: function () {},
-            close: true
+            afterOpen: function () {
+            },
+            beforeOpen: function () {
+            },
+            title: false,
+            close: true,
+            closeBtnTpl: '<a href="#">Закрыть</a>'
         };
         this.finalParams = this.defaultParams;
         for (var key in data) {
@@ -24,28 +32,52 @@ function Modal() {
             }
         }
         this.options = this.finalParams;
+        this.create = false;
+        return this;
+    };
+
+    this.createModal = function () {
+        this.genCloseBtn();
+        this.setTitle();
+        this.create = true;
         return this;
     };
 
     this.getElement = function (el) {
         var thisElement;
+        this.new = false;
 
         if (typeof el === 'object') {
             return el;
         }
 
-        var id = this.makeId(8);
+        this.id = this.makeId(8);
         if (el[0] === '#') {
             thisElement = document.getElementById(el.slice(1));
         }
         else {
             thisElement = document.getElementsByClassName(el.slice(1))[0];
         }
-        thisElement.setAttribute('data-mid', id);
+        if (thisElement.hasAttribute('data-mid')) {
+            for (var i = 0; i < mPool.length; i++) {
+                if(mPool[i].id === thisElement.getAttribute('data-mid')){
+                    thisElement = mPool[i].elem;
+                    this.options = mPool[i].options;
+                    this.id = mPool[i].id;
+                }
+            }
+        }
+        else {
+            thisElement.setAttribute('data-mid', this.id);
+            this.new = true;
+        }
+
         return thisElement;
     };
 
     this.show = function () {
+        console.log(this);
+        this.beforeOpen();
         this.elem.style.display = 'block';
         this.options.afterOpen();
         return this;
@@ -54,6 +86,13 @@ function Modal() {
     this.hide = function () {
         this.elem.style.display = 'none';
         return this;
+    };
+
+    this.fadeIn = function () {
+        this.elem.style.display = 'block';
+        this.elem.style.opacity = '1';
+        /*this.elem.style.transition = "all 2s";*/
+        //this.elem.classList.add('fadeIn');
     };
 
     this.toggle = function () {
@@ -67,10 +106,28 @@ function Modal() {
         return this;
     };
 
-    this.closeBtn = function () {
+    this.genCloseBtn = function () {
         if (this.options.close) {
-            this.title.innerHTML = 123;
+            var closeBtn = document.createElement('div');
+            closeBtn.classList.add('mClose');
+            closeBtn.innerHTML = this.options.closeBtnTpl;
+            this.closeBtn = closeBtn;
+            this.closeBtn.onclick = this.hide.bind(this);
+            this.title.appendChild(this.closeBtn);
         }
+    };
+
+    this.setTitle = function (title) {
+        title = title || false;
+        if(title){
+            this.title.innerHTML = title;
+            this.genCloseBtn();
+        }
+        else if(this.options.title){
+            this.title.innerHTML = this.options.title;
+            this.genCloseBtn();
+        }
+        return this;
     };
 
     this.getModalChild = function () {
@@ -116,7 +173,16 @@ function Modal() {
         return text;
     }
 
+    this.beforeOpen = function(){
+        if(this.create === false){
+            this.createModal();
+        }
+        this.options.beforeOpen();
+    }
+
 }
+
+var mPool = [];
 
 var $m = function (data) {
     var obj = new Modal();

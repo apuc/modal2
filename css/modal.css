@@ -6,3 +6,18 @@
     display: none;
     border: 1px solid brown;
 }
+
+.modal-title {
+    position: relative;
+    padding: 10px;
+}
+
+.mClose {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.fadeIn {
+    opacity: 1;
+}

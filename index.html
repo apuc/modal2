@@ -7,22 +7,37 @@
     <script src="js/modal.js"></script>
 </head>
 <body>
-<a id="show" href="#" data-target="test" data-action="show" data-m>Показать</a><br>
-<a id="hide" href="#" data-target="test" data-action="hide" data-m>Убрать</a><br>
+<!--<a id="show" href="#" data-target="test" data-action="show" data-m>Показать</a><br>
+<a id="hide" href="#" data-target="test" data-action="hide" data-m>Убрать</a><br>-->
 <a id="toggle" href="#" data-target="test" data-m>Тумблер</a><br>
 <a id="script-show" href="#">Показать JS</a><br>
 <a id="script-hide" href="#">Убрать JS</a><br>
+<a id="script-retitle" href="#">Смена заголовка JS</a><br>
 <div class="myModal" id="test">
-    <div class="modal-title"></div>
+    <div class="modal-title">Заголовок</div>
     <div class="model-body"></div>
     <div class="modal-footer"></div>
 </div>
 <script>
     document.getElementById('script-show').onclick = function () {
-        $m('#test').set({close:true}).show();
+        $m('#test').set({
+            close:true,
+            title: 'Заголовок из JS',
+            beforeOpen:function () {
+                console.log('bOpen');
+            },
+            afterOpen: function () {
+                console.log('aOpen');
+            }
+        }).show();
     }
     document.getElementById('script-hide').onclick = function () {
         $m('#test').hide();
+    }
+    document.getElementById('script-retitle').onclick = function () {
+        var myModal = $m('#test');
+        var myModalDom = document.getElementById('test');
+        myModal.setTitle('Новый заголовок JS').show();
     }
 </script>
 </body>
