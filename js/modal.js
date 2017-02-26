@@ -19,7 +19,10 @@ function Modal() {
             },
             beforeOpen: function () {
             },
+            afterClose: function () {
+            },
             effect: 'standard',//fade,standard
+            duration: 500,
             title: false,
             close: true,
             closeBtnTpl: '<a href="#">Закрыть</a>'
@@ -81,21 +84,25 @@ function Modal() {
         this.beforeOpen();
         if(this.options.effect === 'standard'){
             this.elem.style.display = 'block';
+            this.options.afterOpen();
         }
         if(this.options.effect === 'fade'){
-            this.fadeIn();
+            this.fadeIn(this.options.duration,function () {
+                this.options.afterOpen();
+            }.bind(this));
         }
-        this.options.afterOpen();
         return this;
     };
 
     this.hide = function () {
-        console.log(this.options);
         if(this.options.effect === 'standard'){
             this.elem.style.display = 'none';
+            this.options.afterClose();
         }
         if(this.options.effect === 'fade'){
-            this.fadeOut();
+            this.fadeOut(this.options.duration,function () {
+                this.options.afterClose();
+            }.bind(this));
         }
         return this;
     };
@@ -203,7 +210,7 @@ function Modal() {
     }
 
     this.fadeIn = function (duration, callback) {
-        duration = duration || 1000;
+        duration = duration || 500;
         callback = callback || function () {};
         this.elem.style.opacity = 0;
         this.elem.style.display = 'block';
@@ -222,7 +229,7 @@ function Modal() {
     };
 
     this.fadeOut = function (duration, callback) {
-        duration = duration || 1000;
+        duration = duration || 500;
         callback = callback || function () {};
         animate({
             duration: duration,

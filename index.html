@@ -25,11 +25,16 @@
         $m('#test').set({
             close:true,
             title: 'Заголовок из JS',
+            effect: 'fade',//fade,standard
+            duration: 5000,
             beforeOpen:function () {
                 console.log('bOpen');
             },
             afterOpen: function () {
                 console.log('aOpen');
+            },
+            afterClose: function () {
+                console.log('aClose');
             }
         }).show();
     }
