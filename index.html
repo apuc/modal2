@@ -13,6 +13,8 @@
 <a id="script-show" href="#">Показать JS</a><br>
 <a id="script-hide" href="#">Убрать JS</a><br>
 <a id="script-retitle" href="#">Смена заголовка JS</a><br>
+<a id="script-in" href="#">Показать fade</a><br>
+<a id="script-out" href="#">Скрыть fade</a><br>
 <div class="myModal" id="test">
     <div class="modal-title">Заголовок</div>
     <div class="model-body"></div>
@@ -33,6 +35,14 @@
     }
     document.getElementById('script-hide').onclick = function () {
         $m('#test').hide();
+    }
+    document.getElementById('script-in').onclick = function () {
+        $m('#test').fadeIn(500,function () {
+            alert(123);
+        });
+    }
+    document.getElementById('script-out').onclick = function () {
+        $m('#test').fadeOut();
     }
     document.getElementById('script-retitle').onclick = function () {
         var myModal = $m('#test');

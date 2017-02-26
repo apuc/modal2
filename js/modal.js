@@ -19,6 +19,7 @@ function Modal() {
             },
             beforeOpen: function () {
             },
+            effect: 'standard',//fade,standard
             title: false,
             close: true,
             closeBtnTpl: '<a href="#">Закрыть</a>'
@@ -33,6 +34,7 @@ function Modal() {
         }
         this.options = this.finalParams;
         this.create = false;
+        mPool.push({id:this.id,elem:this.elem,options:this.options});
         return this;
     };
 
@@ -76,23 +78,26 @@ function Modal() {
     };
 
     this.show = function () {
-        console.log(this);
         this.beforeOpen();
-        this.elem.style.display = 'block';
+        if(this.options.effect === 'standard'){
+            this.elem.style.display = 'block';
+        }
+        if(this.options.effect === 'fade'){
+            this.fadeIn();
+        }
         this.options.afterOpen();
         return this;
     };
 
     this.hide = function () {
-        this.elem.style.display = 'none';
+        console.log(this.options);
+        if(this.options.effect === 'standard'){
+            this.elem.style.display = 'none';
+        }
+        if(this.options.effect === 'fade'){
+            this.fadeOut();
+        }
         return this;
-    };
-
-    this.fadeIn = function () {
-        this.elem.style.display = 'block';
-        this.elem.style.opacity = '1';
-        /*this.elem.style.transition = "all 2s";*/
-        //this.elem.classList.add('fadeIn');
     };
 
     this.toggle = function () {
@@ -178,6 +183,61 @@ function Modal() {
             this.createModal();
         }
         this.options.beforeOpen();
+    }
+
+    function animate(options) {
+        options.success = options.success || function () {};
+        var start = performance.now();
+        requestAnimationFrame(function animate(time) {
+            var timeFraction = (time - start) / options.duration;
+            if (timeFraction > 1) timeFraction = 1;
+            var progress = options.timing(timeFraction)
+            options.draw(progress);
+            if (timeFraction < 1) {
+                requestAnimationFrame(animate);
+            }
+            else {
+                options.success();
+            }
+        });
+    }
+
+    this.fadeIn = function (duration, callback) {
+        duration = duration || 1000;
+        callback = callback || function () {};
+        this.elem.style.opacity = 0;
+        this.elem.style.display = 'block';
+        animate({
+            duration: duration,
+            timing: function(timeFraction) {
+                return timeFraction;
+            },
+            draw: function(progress) {
+                this.elem.style.opacity = progress;
+            }.bind(this),
+            success: function () {
+                callback();
+            }
+        });
+    };
+
+    this.fadeOut = function (duration, callback) {
+        duration = duration || 1000;
+        callback = callback || function () {};
+        animate({
+            duration: duration,
+            timing: function(timeFraction) {
+                return timeFraction;
+            },
+            draw: function(progress) {
+                this.elem.style.opacity = 1 - progress;
+            }.bind(this),
+            success: function () {
+                this.elem.style.display = 'none';
+                this.elem.style.opacity = 1;
+                callback();
+            }.bind(this)
+        });
     }
 
 }
