@@ -15,6 +15,8 @@
 <a id="script-retitle" href="#">Смена заголовка JS</a><br>
 <a id="script-in" href="#">Показать fade</a><br>
 <a id="script-out" href="#">Скрыть fade</a><br>
+<a id="script-slide-down" href="#">Показать slide</a><br>
+<a id="script-slide-up" href="#">Скрыть slide</a><br>
 <div class="myModal" id="test">
     <div class="modal-title">Заголовок</div>
     <div class="model-body"></div>
@@ -25,7 +27,7 @@
         $m('#test').set({
             close:true,
             title: 'Заголовок из JS',
-            effect: 'fade',//fade,standard
+            effect: 'slide',//fade,standard,slide
             duration: 5000,
             beforeOpen:function () {
                 console.log('bOpen');
@@ -48,6 +50,12 @@
     }
     document.getElementById('script-out').onclick = function () {
         $m('#test').fadeOut();
+    }
+    document.getElementById('script-slide-down').onclick = function () {
+        $m('#test').slideDown(1000);
+    }
+    document.getElementById('script-slide-up').onclick = function () {
+        $m('#test').slideUp(1000);
     }
     document.getElementById('script-retitle').onclick = function () {
         var myModal = $m('#test');

@@ -5,10 +5,10 @@ function Modal() {
     this.init = function (data) {
         this.elem = this.getElement(data);
         this.getModalChild();
-        if(this.new){
+        if (this.new) {
             this.create = false;
             this.set();
-            mPool.push({id:this.id,elem:this.elem,options:this.options});
+            mPool.push({id: this.id, elem: this.elem, options: this.options});
         }
         return this;
     };
@@ -21,7 +21,7 @@ function Modal() {
             },
             afterClose: function () {
             },
-            effect: 'standard',//fade,standard
+            effect: 'standard',//fade,standard,slide
             duration: 500,
             title: false,
             close: true,
@@ -37,7 +37,7 @@ function Modal() {
         }
         this.options = this.finalParams;
         this.create = false;
-        mPool.push({id:this.id,elem:this.elem,options:this.options});
+        mPool.push({id: this.id, elem: this.elem, options: this.options});
         return this;
     };
 
@@ -65,7 +65,7 @@ function Modal() {
         }
         if (thisElement.hasAttribute('data-mid')) {
             for (var i = 0; i < mPool.length; i++) {
-                if(mPool[i].id === thisElement.getAttribute('data-mid')){
+                if (mPool[i].id === thisElement.getAttribute('data-mid')) {
                     thisElement = mPool[i].elem;
                     this.options = mPool[i].options;
                     this.id = mPool[i].id;
@@ -82,12 +82,17 @@ function Modal() {
 
     this.show = function () {
         this.beforeOpen();
-        if(this.options.effect === 'standard'){
+        if (this.options.effect === 'standard') {
             this.elem.style.display = 'block';
             this.options.afterOpen();
         }
-        if(this.options.effect === 'fade'){
-            this.fadeIn(this.options.duration,function () {
+        if (this.options.effect === 'fade') {
+            this.fadeIn(this.options.duration, function () {
+                this.options.afterOpen();
+            }.bind(this));
+        }
+        if (this.options.effect === 'slide') {
+            this.slideDown(this.options.duration, function () {
                 this.options.afterOpen();
             }.bind(this));
         }
@@ -95,12 +100,17 @@ function Modal() {
     };
 
     this.hide = function () {
-        if(this.options.effect === 'standard'){
+        if (this.options.effect === 'standard') {
             this.elem.style.display = 'none';
             this.options.afterClose();
         }
-        if(this.options.effect === 'fade'){
-            this.fadeOut(this.options.duration,function () {
+        if (this.options.effect === 'fade') {
+            this.fadeOut(this.options.duration, function () {
+                this.options.afterClose();
+            }.bind(this));
+        }
+        if (this.options.effect === 'slide') {
+            this.slideUp(this.options.duration, function () {
                 this.options.afterClose();
             }.bind(this));
         }
@@ -131,11 +141,11 @@ function Modal() {
 
     this.setTitle = function (title) {
         title = title || false;
-        if(title){
+        if (title) {
             this.title.innerHTML = title;
             this.genCloseBtn();
         }
-        else if(this.options.title){
+        else if (this.options.title) {
             this.title.innerHTML = this.options.title;
             this.genCloseBtn();
         }
@@ -185,15 +195,16 @@ function Modal() {
         return text;
     }
 
-    this.beforeOpen = function(){
-        if(this.create === false){
+    this.beforeOpen = function () {
+        if (this.create === false) {
             this.createModal();
         }
         this.options.beforeOpen();
     }
 
     function animate(options) {
-        options.success = options.success || function () {};
+        options.success = options.success || function () {
+            };
         var start = performance.now();
         requestAnimationFrame(function animate(time) {
             var timeFraction = (time - start) / options.duration;
@@ -211,32 +222,35 @@ function Modal() {
 
     this.fadeIn = function (duration, callback) {
         duration = duration || 500;
-        callback = callback || function () {};
+        callback = callback || function () {
+            };
         this.elem.style.opacity = 0;
         this.elem.style.display = 'block';
         animate({
             duration: duration,
-            timing: function(timeFraction) {
+            timing: function (timeFraction) {
                 return timeFraction;
             },
-            draw: function(progress) {
+            draw: function (progress) {
                 this.elem.style.opacity = progress;
             }.bind(this),
             success: function () {
                 callback();
             }
         });
+        return this;
     };
 
     this.fadeOut = function (duration, callback) {
         duration = duration || 500;
-        callback = callback || function () {};
+        callback = callback || function () {
+            };
         animate({
             duration: duration,
-            timing: function(timeFraction) {
+            timing: function (timeFraction) {
                 return timeFraction;
             },
-            draw: function(progress) {
+            draw: function (progress) {
                 this.elem.style.opacity = 1 - progress;
             }.bind(this),
             success: function () {
@@ -245,6 +259,55 @@ function Modal() {
                 callback();
             }.bind(this)
         });
+        return this;
+    }
+
+    this.slideDown =function (duration, callback) {
+        duration = duration || 500;
+        callback = callback || function () {
+            };
+        var computedStyle = getComputedStyle(this.elem);
+        var h = computedStyle.height;
+        h = h.substring(0, h.length - 2);
+        this.elem.style.height = 0;
+        this.elem.style.display = "block";
+        animate({
+            duration: duration,
+            timing: function (timeFraction) {
+                return timeFraction;
+            },
+            draw: function (progress) {
+                this.elem.style.height = progress * h + "px";
+            }.bind(this),
+            success: function () {
+                callback();
+            }
+        });
+        return this;
+    }
+
+    this.slideUp = function (duration, callback) {
+        duration = duration || 500;
+        callback = callback || function () {
+            };
+        var computedStyle = getComputedStyle(this.elem);
+        var h = computedStyle.height;
+        h = h.substring(0, h.length - 2);
+        animate({
+            duration: duration,
+            timing: function (timeFraction) {
+                return timeFraction;
+            },
+            draw: function (progress) {
+                this.elem.style.height = (1 - progress) * h + "px";
+            }.bind(this),
+            success: function () {
+                this.elem.style.display = 'none';
+                this.elem.style.height = h + 'px';
+                callback();
+            }.bind(this)
+        });
+        return this;
     }
 
 }
