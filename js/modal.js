@@ -5,11 +5,13 @@ function Modal() {
     this.init = function (data) {
         this.elem = this.getElement(data);
         this.getModalChild();
-        if (this.new) {
-            this.create = false;
-            this.set();
-            mPool.push({id: this.id, elem: this.elem, options: this.options});
-        }
+        // if (this.new) {
+        //     this.create = false;
+        //     this.set();
+        //     mPool.push({id: this.id, elem: this.elem, options: this.options});
+        // }
+        this.set();
+        this.createOverlay();
         return this;
     };
 
@@ -37,7 +39,7 @@ function Modal() {
         }
         this.options = this.finalParams;
         this.create = false;
-        mPool.push({id: this.id, elem: this.elem, options: this.options});
+        //mPool.push({id: this.id, elem: this.elem, options: this.options});
         return this;
     };
 
@@ -63,27 +65,41 @@ function Modal() {
         else {
             thisElement = document.getElementsByClassName(el.slice(1))[0];
         }
-        if (thisElement.hasAttribute('data-mid')) {
-            for (var i = 0; i < mPool.length; i++) {
-                if (mPool[i].id === thisElement.getAttribute('data-mid')) {
-                    thisElement = mPool[i].elem;
-                    this.options = mPool[i].options;
-                    this.id = mPool[i].id;
-                }
-            }
+        // if (thisElement.hasAttribute('data-mid')) {
+        //     for (var i = 0; i < mPool.length; i++) {
+        //         if (mPool[i].id === thisElement.getAttribute('data-mid')) {
+        //             thisElement = mPool[i].elem;
+        //             this.options = mPool[i].options;
+        //             this.id = mPool[i].id;
+        //         }
+        //     }
+        // }
+        // else {
+        //     thisElement.setAttribute('data-mid', this.id);
+        //     this.new = true;
+        // }
+        return thisElement;
+    };
+
+    this.createOverlay = function () {
+        var overlay = document.getElementsByClassName('__overlay')[0];
+        if(overlay){
+            this.overlay = overlay;
         }
         else {
-            thisElement.setAttribute('data-mid', this.id);
-            this.new = true;
+            overlay = document.createElement('div');
+            overlay.classList.add('__overlay');
+            document.getElementsByTagName('body')[0].appendChild(overlay);
+            this.overlay = overlay;
         }
-
-        return thisElement;
+        this.overlay.onclick = this.hide.bind(this);
     };
 
     this.show = function () {
         this.beforeOpen();
         if (this.options.effect === 'standard') {
             this.elem.style.display = 'block';
+            this.overlay.style.display = 'block';
             this.options.afterOpen();
         }
         if (this.options.effect === 'fade') {
@@ -102,6 +118,7 @@ function Modal() {
     this.hide = function () {
         if (this.options.effect === 'standard') {
             this.elem.style.display = 'none';
+            this.overlay.style.display = 'none';
             this.options.afterClose();
         }
         if (this.options.effect === 'fade') {
@@ -193,14 +210,14 @@ function Modal() {
             text += possible.charAt(Math.floor(Math.random() * possible.length));
 
         return text;
-    }
+    };
 
     this.beforeOpen = function () {
         if (this.create === false) {
             this.createModal();
         }
         this.options.beforeOpen();
-    }
+    };
 
     function animate(options) {
         options.success = options.success || function () {
@@ -209,7 +226,7 @@ function Modal() {
         requestAnimationFrame(function animate(time) {
             var timeFraction = (time - start) / options.duration;
             if (timeFraction > 1) timeFraction = 1;
-            var progress = options.timing(timeFraction)
+            var progress = options.timing(timeFraction);
             options.draw(progress);
             if (timeFraction < 1) {
                 requestAnimationFrame(animate);
@@ -226,6 +243,8 @@ function Modal() {
             };
         this.elem.style.opacity = 0;
         this.elem.style.display = 'block';
+        this.overlay.style.display = 'block';
+        this.options.effect = 'fade';
         animate({
             duration: duration,
             timing: function (timeFraction) {
@@ -255,14 +274,15 @@ function Modal() {
             }.bind(this),
             success: function () {
                 this.elem.style.display = 'none';
+                this.overlay.style.display = 'none';
                 this.elem.style.opacity = 1;
                 callback();
             }.bind(this)
         });
         return this;
-    }
+    };
 
-    this.slideDown =function (duration, callback) {
+    this.slideDown = function (duration, callback) {
         duration = duration || 500;
         callback = callback || function () {
             };
@@ -271,6 +291,8 @@ function Modal() {
         h = h.substring(0, h.length - 2);
         this.elem.style.height = 0;
         this.elem.style.display = "block";
+        this.overlay.style.display = 'block';
+        this.options.effect = 'slide';
         animate({
             duration: duration,
             timing: function (timeFraction) {
@@ -284,7 +306,7 @@ function Modal() {
             }
         });
         return this;
-    }
+    };
 
     this.slideUp = function (duration, callback) {
         duration = duration || 500;
@@ -303,6 +325,7 @@ function Modal() {
             }.bind(this),
             success: function () {
                 this.elem.style.display = 'none';
+                this.overlay.style.display = 'none';
                 this.elem.style.height = h + 'px';
                 callback();
             }.bind(this)
@@ -312,11 +335,26 @@ function Modal() {
 
 }
 
-var mPool = [];
+//var mPool = [];
+var objPool = [];
 
 var $m = function (data) {
-    var obj = new Modal();
-    return obj.init(data);
+    var obj = _getObj(data, objPool);
+    if (!obj) {
+        obj = new Modal();
+        obj.init(data);
+        objPool.push({id: data, obj: obj});
+    }
+    return obj
+};
+
+function _getObj(id, op) {
+    for (var i = 0; i < op.length; i++) {
+        if (op[i].id == id) {
+            return op[i].obj;
+        }
+    }
+    return false;
 }
 
 document.addEventListener("DOMContentLoaded", ready);

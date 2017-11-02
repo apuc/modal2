@@ -5,6 +5,11 @@
     margin: 30px auto;
     display: none;
     border: 1px solid brown;
+    z-index: 1;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .modal-title {
@@ -20,4 +25,14 @@
 
 .fadeIn {
     opacity: 1;
+}
+
+.__overlay {
+    position: fixed;
+    background-color: rgba(0,0,0,0.5);
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    display: none;
+    z-index: 0;
 }
