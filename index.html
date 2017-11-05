@@ -19,13 +19,13 @@
 <a id="script-slide-up" href="#">Скрыть slide</a><br>
 
 <div class="myModal" id="test">
-    <div class="modal-title">Заголовок</div>
+    <div class="modal-title">Заголовок 1</div>
     <div class="model-body"></div>
     <div class="modal-footer"></div>
 </div>
 
 <div class="myModal" id="test2">
-    <div class="modal-title">Заголовок</div>
+    <div class="modal-title">Заголовок 2</div>
     <div class="model-body"></div>
     <div class="modal-footer"></div>
 </div>
@@ -33,7 +33,7 @@
     document.getElementById('script-show').onclick = function () {
         $m('#test').set({
             close:true,
-            title: 'Заголовок из JS',
+            //title: 'Заголовок из JS',
             effect: 'slide',//fade,standard,slide
             duration: 2000,
             beforeOpen:function () {
@@ -67,7 +67,7 @@
     document.getElementById('script-retitle').onclick = function () {
         var myModal = $m('#test');
         var myModalDom = document.getElementById('test');
-        myModal.setTitle('Новый заголовок JS').show();
+       // myModal.setTitle('Новый заголовок JS').show();
     }
 </script>
 </body>

@@ -4,14 +4,11 @@ function Modal() {
 
     this.init = function (data) {
         this.elem = this.getElement(data);
+        this.data = data;
         this.getModalChild();
-        // if (this.new) {
-        //     this.create = false;
-        //     this.set();
-        //     mPool.push({id: this.id, elem: this.elem, options: this.options});
-        // }
         this.set();
-        this.createOverlay();
+        this.overlay = document.getElementsByClassName('__overlay')[0];
+        //this.overlay.addEventListener('click', this.closeByOverlay.bind(this));
         return this;
     };
 
@@ -39,7 +36,6 @@ function Modal() {
         }
         this.options = this.finalParams;
         this.create = false;
-        //mPool.push({id: this.id, elem: this.elem, options: this.options});
         return this;
     };
 
@@ -65,39 +61,20 @@ function Modal() {
         else {
             thisElement = document.getElementsByClassName(el.slice(1))[0];
         }
-        // if (thisElement.hasAttribute('data-mid')) {
-        //     for (var i = 0; i < mPool.length; i++) {
-        //         if (mPool[i].id === thisElement.getAttribute('data-mid')) {
-        //             thisElement = mPool[i].elem;
-        //             this.options = mPool[i].options;
-        //             this.id = mPool[i].id;
-        //         }
-        //     }
-        // }
-        // else {
-        //     thisElement.setAttribute('data-mid', this.id);
-        //     this.new = true;
-        // }
         return thisElement;
     };
 
-    this.createOverlay = function () {
-        var overlay = document.getElementsByClassName('__overlay')[0];
-        if(overlay){
-            this.overlay = overlay;
+    this.closeByOverlay = function () {
+        for (var i = 0; i < objPool.length; i++) {
+              if(objPool[i].id === this.data){
+                  objPool[i].obj.hide();
+              }
         }
-        else {
-            overlay = document.createElement('div');
-            overlay.classList.add('__overlay');
-            document.getElementsByTagName('body')[0].appendChild(overlay);
-            this.overlay = overlay;
-        }
-        this.overlay.onclick = this.hide.bind(this);
     };
 
     this.show = function () {
-        this.beforeOpen();
         if (this.options.effect === 'standard') {
+            this.beforeOpen();
             this.elem.style.display = 'block';
             this.overlay.style.display = 'block';
             this.options.afterOpen();
@@ -216,6 +193,7 @@ function Modal() {
         if (this.create === false) {
             this.createModal();
         }
+        this.overlay.onclick = this.closeByOverlay.bind(this);
         this.options.beforeOpen();
     };
 
@@ -238,6 +216,7 @@ function Modal() {
     }
 
     this.fadeIn = function (duration, callback) {
+        this.beforeOpen();
         duration = duration || 500;
         callback = callback || function () {
             };
@@ -283,6 +262,7 @@ function Modal() {
     };
 
     this.slideDown = function (duration, callback) {
+        this.beforeOpen();
         duration = duration || 500;
         callback = callback || function () {
             };
@@ -359,6 +339,9 @@ function _getObj(id, op) {
 
 document.addEventListener("DOMContentLoaded", ready);
 function ready() {
+    var overlay = document.createElement('div');
+    overlay.classList.add('__overlay');
+    document.getElementsByTagName('body')[0].appendChild(overlay);
     var links = document.getElementsByTagName('a');
     for (var i = 0; i < links.length; i++) {
         if (links[i].hasAttribute('data-m')) {
